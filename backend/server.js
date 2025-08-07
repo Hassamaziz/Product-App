@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import Product from "./models/product.model.js";
+import mongoose from "mongoose";
 
 dotenv.config();
 
@@ -55,9 +56,9 @@ app.put("/api/products/:id", async (req, res) => {
     const { id } = req.params;
     const product = req.body;
 
-    // if (!updatedProduct.name || !updatedProduct.price || !updatedProduct.image) {
-    //     return res.status(400).json({ success: false, message: "Name, price and image are required" });
-    // }
+   if(!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ success: false, message: "Invalid product ID" });
+    }
 
     try {
         const updatedProduct = await Product.findByIdAndUpdate(id, product, { new: true });
@@ -66,8 +67,7 @@ app.put("/api/products/:id", async (req, res) => {
         }
         return res.status(200).json({ success: true, updatedProduct });
     } catch (error) {
-        console.error("Error updating product:", error);
-        return res.status(500).json({ success: false, message: "Internal server error" });
+        return res.status(500).json({ success: false, message: "Error Updating Product" });
     }
 })
 
