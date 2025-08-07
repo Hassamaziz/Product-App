@@ -51,6 +51,26 @@ app.delete("/api/products/:id", async (req, res) => {
     }
 });
 
+app.put("/api/products/:id", async (req, res) => {
+    const { id } = req.params;
+    const product = req.body;
+
+    // if (!updatedProduct.name || !updatedProduct.price || !updatedProduct.image) {
+    //     return res.status(400).json({ success: false, message: "Name, price and image are required" });
+    // }
+
+    try {
+        const updatedProduct = await Product.findByIdAndUpdate(id, product, { new: true });
+        if (!updatedProduct) {
+            return res.status(404).json({ success: false, message: "Product not found" });
+        }
+        return res.status(200).json({ success: true, updatedProduct });
+    } catch (error) {
+        console.error("Error updating product:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+})
+
 
 app.listen(5000, () => {
   connectDB();
