@@ -9,6 +9,16 @@ const app = express();
 
 app.use(express.json());
 
+app.get("/api/products", async (req, res) => {
+    try {
+        const products = await Product.find({});
+        return res.status(200).json({ success: true, products });
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+
 app.post("/api/products",async (req, res) => {
     const product = req.body;
     if (!product.name || !product.price || !product.image) {
