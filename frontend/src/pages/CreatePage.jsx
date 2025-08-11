@@ -32,7 +32,6 @@ const CreatePage = () => {
       });
     }
     setNewProduct({ name: '', price: 0, image: '' });
-    
   }
 
   return (
