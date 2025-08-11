@@ -1,5 +1,6 @@
-import { Box, Container, Heading, Input, useColorModeValue, VStack } from '@chakra-ui/react';
+import { Box, Button, Container, Heading, Input, useColorModeValue, useToast, VStack } from '@chakra-ui/react';
 import React, { useState } from 'react'
+import { useProductStore } from '../store/product';
 
 const CreatePage = () => {
   const [newProduct, setNewProduct] = useState({
@@ -7,6 +8,32 @@ const CreatePage = () => {
     price: 0,
     image: ''
   });
+  const toast = useToast();
+
+
+  const { createProduct } = useProductStore();
+  const handleAddProduct = async () => {
+    const {success,message} = await createProduct(newProduct);
+    if (!success) {
+ toast({
+        title: 'Error.',
+        description: message,
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+      });
+    }else{
+     toast({
+        title: 'Success.',
+        description: message,
+        status: 'success',
+        duration: 4000,
+        isClosable: true,
+      });
+    }
+    setNewProduct({ name: '', price: 0, image: '' });
+    
+  }
 
   return (
     <Container maxW={"container.sm"}>
@@ -20,20 +47,30 @@ const CreatePage = () => {
           <VStack spacing={4}>
             <Input
               placeholder="Product Name"
+              name='name'
               value={newProduct.name}
               onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
             />
             <Input
               placeholder="Product Price"
               type="number"
+              name='price'
               value={newProduct.price}
               onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
             />
             <Input
               placeholder="Product Image URL"
+              name='image'
               value={newProduct.image}
               onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
             />
+            <Button
+              colorScheme="blue"
+              width="full"
+              onClick={handleAddProduct}
+            >
+              Create Product
+            </Button>
           </VStack>
         </Box>
       </VStack>
