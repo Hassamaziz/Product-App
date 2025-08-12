@@ -1,16 +1,21 @@
-import { Container, SimpleGrid, Text, VStack } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { Container, SimpleGrid, Text, VStack, Spinner } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useProductStore } from "../store/product";
 import ProductCard from "../components/ProductCard";
 
 const HomePage = () => {
 	const { fetchProducts, products } = useProductStore();
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		fetchProducts();
+		const loadProducts = async () => {
+			setLoading(true);
+			await fetchProducts();
+			setLoading(false);
+		};
+		loadProducts();
 	}, [fetchProducts]);
-	console.log("products", products);
 
 	return (
 		<Container maxW='container.xl' py={12}>
@@ -25,21 +30,11 @@ const HomePage = () => {
 					Current Products 🚀
 				</Text>
 
-				<SimpleGrid
-					columns={{
-						base: 1,
-						md: 2,
-						lg: 3,
-					}}
-					spacing={10}
-					w={"full"}
-				>
-					{products.map((product) => (
-						<ProductCard key={product._id} product={product} />
-					))}
-				</SimpleGrid>
-
-				{products.length === 0 && (
+				{/* Loading State */}
+				{loading ? (
+					<Spinner size="xl" thickness="4px" color="blue.500" />
+				) : products.length === 0 ? (
+					// Empty State
 					<Text fontSize='xl' textAlign={"center"} fontWeight='bold' color='gray.500'>
 						No products found 😢{" "}
 						<Link to={"/create"}>
@@ -48,9 +43,25 @@ const HomePage = () => {
 							</Text>
 						</Link>
 					</Text>
+				) : (
+					// Success State
+					<SimpleGrid
+						columns={{
+							base: 1,
+							md: 2,
+							lg: 3,
+						}}
+						spacing={10}
+						w={"full"}
+					>
+						{products.map((product) => (
+							<ProductCard key={product._id} product={product} />
+						))}
+					</SimpleGrid>
 				)}
 			</VStack>
 		</Container>
 	);
 };
+
 export default HomePage;
